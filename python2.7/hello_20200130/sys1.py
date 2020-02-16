@@ -6,6 +6,7 @@ print(sys.platform)
 print(sys.version)
 print(sys.copyright)
 print(sys.path)
+print(sys.stdin.encoding)
 
 #상위 디렉토리에 lib가 있을 경우 path를 추가해서 접근할 있게 한다.
 #sys.path.append("절대경로 or os의 현재 위치를 가져오면 될꺼당아래 내용 참고")

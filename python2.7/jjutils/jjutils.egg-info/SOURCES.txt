@@ -1,0 +1,8 @@
+setup.py
+jjutils/Game.py
+jjutils.egg-info/PKG-INFO
+jjutils.egg-info/SOURCES.txt
+jjutils.egg-info/dependency_links.txt
+jjutils.egg-info/not-zip-safe
+jjutils.egg-info/requires.txt
+jjutils.egg-info/top_level.txt
