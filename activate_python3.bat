@@ -1,0 +1,1 @@
+c:\Python\venv\python38env\Scripts\activate.bat

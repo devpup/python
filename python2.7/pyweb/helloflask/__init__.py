@@ -1,10 +1,24 @@
 #-*- coding: utf-8 -*-
-from flask import Flask, g, request, Response, make_response
+from flask import Flask, g, request, Response, make_response, session
+from flask import render_template, jsonify
+from datetime import datetime, date, timedelta
 
 app = Flask(__name__)
 app.debug = True
-
 app.config['SERVER_NAME'] = 'localhost:5000'
+#app.jinja_env.trim_blocks = True
+app.config.update(
+    SECRET_KEY='X1234yRH1lkjdfal',
+    SESSION_COOKIE_NAME='pyweb_flask_session',
+    PERMANENT_SESSION_LIFETIME=timedelta(31)
+)
+
+
+#################### html ################
+@app.route("/tmp1")
+def tmp1():
+    #templates directory 는 flask가 설정해둬서 바로 불러도 됨
+    return render_template('index.html', title="Title")
 
 
 ########## Request Event Handler ##########
@@ -100,7 +114,7 @@ def rp():
 
 ########## Request Parameter Custom Function Type ##########
 
-from datetime import datetime, date
+#from datetime import datetime, date
 def ymd(fmt):
     def trans(date_str):
         return datetime.strptime(date_str, fmt)
@@ -138,12 +152,98 @@ def dt():
 
 
 ########## request ##########
-request.is_xhr #ajax 로 호출했는지?
-request.endporint #내 uri
-request.get_json() #ajax로 불렀을때 & body type이 json인 data(json)을 준다
-app.config.update(MAX_CONTENT_LENGTH=1024*1024) #편지지에 쓸 수 있는 최대 BYTE
-request.max_content_length #현재 max_content_length 크기
+# request.is_xhr #ajax 로 호출했는지?
+# request.endporint #내 uri
+# request.get_json() #ajax로 불렀을때 & body type이 json인 data(json)을 준다
+# app.config.update(MAX_CONTENT_LENGTH=1024*1024) #편지지에 쓸 수 있는 최대 BYTE
+# request.max_content_length #현재 max_content_length 크기
 ################################
+
+########## response object ##########
+# Response attributes
+# -headers
+# -status
+# -status_code
+# -data
+# -mimetype
+
+# ex)
+# res = Response("Test")
+# res.headers.add('Program-Name','Test Response')
+# res.set_Data("This is Test Program.")
+# res.set_cookie("UserToken", "A12Bc9")
+
+################################
+
+
+########## cookie ##########
+#Cookie __init__ Arguments
+# - key
+# - value
+# - max_age -> 기간을 줌 1day
+# - expires -> 오늘밤 12시 date를 줌
+# - domain
+# - path
+
+# ex)
+# res = Response("Test")
+# res.set_cookie("UserToken", "A123Bc0")
+
+# #other request
+# request.cookieis.get("UserToken", "default_token")
+
+#http://localhost:5000/writecookie?key=token&val=abcabc
+#f12 application cookie에서 확인
+@app.route('/writecookie')
+def writecookie():
+    key = request.args.get('key')
+    val = request.args.get('val')
+    res = Response("SET COOKIE")
+    res.set_cookie(key, val)
+    session['Token'] = '123X'
+    return make_response(res)
+
+#http://localhost:5000/readcookie?key=token
+@app.route('/readcookie')
+def readcookie():
+    key = request.args.get('key')
+    print(type(key), "key")
+    val = request.cookies.get(key)
+    print(type(val), "val")
+    return "cookie[" + key + "]=" + val + " , " + session.get('Token')
+
+################################
+
+
+#################### session ####################
+# from flask import session
+# app.secret_key ='X1234yRH1lkjdfal'
+# or
+# app.config.update(
+#     SECRET_KEY='X1234yRH1lkjdfal',
+#     SESSION_COOKIE_NAME='pyweb_flask_session',
+#     PERMANENT_SESSION_LIFETIME=timedelta(31) #31 days
+# )
+
+#Save to Memory, file or DB
+
+@app.route('/setsess')
+def setsess():
+    session['Token'] = '123X'
+    return u"Session이 설정되었습니다!".encode('utf8')
+
+@app.route('/getsess')
+def getsess():
+    return session.get('Token')
+
+@app.route('/delsess')
+def delsess():
+    if session.get('Token'):
+        del session['Token']
+    return u"Session이 삭제되었습니다.".encode('utf8')
+
+################################################################
+
 
 @app.route('/test_wsgi')
 def wsgi_test():
